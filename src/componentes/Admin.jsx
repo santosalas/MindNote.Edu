@@ -22,6 +22,39 @@ function Admin() {
     setUsuarios(registrados);
   }, [navigate]);
 
+  // Función para eliminar usuario
+  const eliminarUsuario = (email) => {
+    Swal.fire({
+      title: "¿Estás seguro?",
+      text: `Vas a eliminar al usuario con correo: ${email}`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Sí, eliminar",
+      cancelButtonText: "Cancelar",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const nuevosUsuarios = usuarios.filter((u) => u.email !== email);
+
+        // Actualizar localStorage
+        localStorage.setItem("registeredUsers", JSON.stringify(nuevosUsuarios));
+
+        // Si el usuario eliminado es el que está logueado, cerrar sesión
+        const currentUser = JSON.parse(localStorage.getItem("user"));
+        if (currentUser && currentUser.email === email) {
+          localStorage.removeItem("user");
+          Swal.fire("Usuario eliminado", "Tu sesión ha sido cerrada.", "info");
+          navigate("/login");
+          return;
+        }
+
+        // Actualizar estado para renderizar tabla
+        setUsuarios(nuevosUsuarios);
+
+        Swal.fire("Eliminado", "El usuario ha sido eliminado correctamente.", "success");
+      }
+    });
+  };
+
   return (
     <div className="admin-container">
       <h2>Panel de Administrador</h2>
@@ -33,6 +66,7 @@ function Admin() {
             <th>Nombre</th>
             <th>Correo</th>
             <th>Rol</th>
+            <th>Acciones</th> {/* Nueva columna para botones */}
           </tr>
         </thead>
         <tbody>
@@ -42,11 +76,19 @@ function Admin() {
                 <td>{u.nombre}</td>
                 <td>{u.email}</td>
                 <td>{u.rol}</td>
+                <td>
+                  <button
+                    className="btn-eliminar"
+                    onClick={() => eliminarUsuario(u.email)}
+                  >
+                    Eliminar
+                  </button>
+                </td>
               </tr>
             ))
           ) : (
             <tr>
-              <td colSpan="3">No hay usuarios registrados</td>
+              <td colSpan="4">No hay usuarios registrados</td>
             </tr>
           )}
         </tbody>

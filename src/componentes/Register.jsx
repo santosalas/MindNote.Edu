@@ -1,27 +1,25 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Swal from "sweetalert2";
-import "../styles/Register.css"; // ajusta la ruta si hace falta
-
+import "../styles/Register.css";
 
 function Register() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rol, setRol] = useState("usuario"); // por defecto usuario
+  const [rol, setRol] = useState("usuario");
   const [claveAdmin, setClaveAdmin] = useState("");
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
 
   const navigate = useNavigate();
 
-  // 🚫 Evitar que un usuario logueado vuelva a entrar aquí
   useEffect(() => {
     const user = JSON.parse(localStorage.getItem("user"));
     if (user) {
       Swal.fire({
         icon: "info",
         title: "Ya tienes sesión activa",
-        text: "Si quieres registrarte otra vez cierra sesión primero."
+        text: "Si quieres registrarte otra vez cierra sesión primero.",
       }).then(() => {
         if (user.rol === "administrador") {
           navigate("/admin");
@@ -35,7 +33,6 @@ function Register() {
   const handleRegister = (e) => {
     e.preventDefault();
 
-    // Validaciones básicas
     if (!nombre.trim() || !email.trim() || !password.trim()) {
       Swal.fire("Error", "Todos los campos son obligatorios.", "error");
       return;
@@ -47,24 +44,17 @@ function Register() {
     }
 
     if (rol === "administrador" && claveAdmin !== "MindNote.edu") {
-      Swal.fire(
-        "Error",
-        "La clave especial de administrador es incorrecta.",
-        "error"
-      );
+      Swal.fire("Error", "La clave especial de administrador es incorrecta.", "error");
       return;
     }
 
-    // Verificar si el correo ya existe
-    const registeredUsers =
-      JSON.parse(localStorage.getItem("registeredUsers")) || [];
+    const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers")) || [];
 
     if (registeredUsers.some((u) => u.email === email)) {
       Swal.fire("Error", "Este correo ya está registrado.", "error");
       return;
     }
 
-    // Guardar usuario
     const newUser = {
       nombre: nombre.trim(),
       email: email.trim(),
@@ -88,9 +78,17 @@ function Register() {
   const openTerminos = (e) => {
     e.preventDefault();
     Swal.fire({
-      title: "Términos y Condiciones",
-      html:
-        "<p>Al registrarte aceptas los términos y condiciones de Mindnote. Aquí puedes poner los términos reales o un enlace a la política de privacidad.</p>",
+      title: "Términos y Condiciones de MindNote",
+      html: `
+        <p><strong>1. Aceptación de los Términos:</strong> Al registrarte y utilizar MindNote, aceptas cumplir con estos términos y condiciones en su totalidad.</p>
+        <p><strong>2. Uso Personal:</strong> Esta aplicación está destinada únicamente para uso personal y educativo. No se permite el uso con fines comerciales sin autorización previa.</p>
+        <p><strong>3. Privacidad:</strong> La información que nos proporcionas (nombre, correo, etc.) se almacena localmente en tu navegador y no se comparte con terceros.</p>
+        <p><strong>4. Seguridad de la Cuenta:</strong> Eres responsable de mantener la confidencialidad de tus credenciales. No compartas tu contraseña.</p>
+        <p><strong>5. Rol de Administrador:</strong> El acceso como administrador requiere una clave especial. Este rol tiene permisos adicionales, como visualizar y gestionar usuarios.</p>
+        <p><strong>6. Propiedad Intelectual:</strong> Todo el contenido de MindNote, incluyendo textos, diseños e interfaz, es propiedad del desarrollador y no puede ser copiado sin permiso.</p>
+        <p><strong>7. Cambios:</strong> Estos términos pueden ser modificados en cualquier momento. Se notificará a los usuarios registrados si hay cambios relevantes.</p>
+        <p><strong>8. Contacto:</strong> Si tienes dudas o comentarios, puedes escribirnos a <a href="mailto:soporte@mindnote.com">soporte@mindnote.com</a>.</p>
+      `,
       width: 600,
       confirmButtonText: "Cerrar",
     });
