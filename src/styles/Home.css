@@ -17,3 +17,29 @@
   max-width: 600px;
   margin: 0 auto;
 }
+.btn-start {
+  margin-top: 25px;
+  background-color: #2563eb;
+  color: white;
+  border: none;
+  padding: 12px 28px;
+  border-radius: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-start:hover {
+  background-color: #1e40af;
+  transform: scale(1.05);
+}
+
+/* 📱 Adaptación en móviles */
+@media (max-width: 600px) {
+  .btn-start {
+    width: 80%;
+    padding: 10px;
+    font-size: 1rem;
+  }
+}

@@ -1,8 +1,12 @@
+/* 🌟 --- ESTILO BASE --- */
+
 .notas-main {
   display: flex;
   gap: 30px;
   padding: 20px;
   align-items: flex-start;
+  justify-content: center;
+  flex-wrap: wrap;
 }
 
 .calendar-section {
@@ -11,6 +15,7 @@
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 280px;
 }
 
 .notas-container {
@@ -19,8 +24,10 @@
   padding: 20px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  min-width: 300px;
 }
 
+/* 🧠 INPUTS */
 .notas-inputs {
   margin-top: 20px;
   display: flex;
@@ -33,6 +40,7 @@
   padding: 10px;
   border: 1px solid #ccc;
   border-radius: 8px;
+  font-size: 1rem;
 }
 
 .notas-add-btn {
@@ -42,16 +50,20 @@
   color: white;
   border-radius: 8px;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.2s;
+  font-weight: 600;
 }
 
 .notas-add-btn:hover {
   background: #3791d3;
+  transform: scale(1.03);
 }
 
+/* 📝 LISTA DE NOTAS */
 .notas-list {
   list-style: none;
   padding: 0;
+  margin-top: 15px;
 }
 
 .notas-item {
@@ -62,6 +74,12 @@
   padding: 10px;
   margin-bottom: 10px;
   border-radius: 8px;
+  transition: background 0.3s, transform 0.2s;
+}
+
+.notas-item:hover {
+  background: #eaf4ff;
+  transform: scale(1.02);
 }
 
 .notas-item.done {
@@ -75,8 +93,15 @@
   border: none;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: 500;
+  transition: transform 0.2s;
 }
 
+.notas-actions button:hover {
+  transform: scale(1.1);
+}
+
+/* 🎨 BOTONES DE ACCIÓN */
 .notas-btn-check {
   background: #4caf50;
   color: white;
@@ -91,6 +116,31 @@
   background: #f44336;
   color: white;
 }
+
+/* 🔝 ENCABEZADO */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #4cafef;
+  padding: 15px 30px;
+  border-radius: 0 0 12px 12px;
+  color: white;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.header h1 {
+  font-size: 1.8rem;
+  margin: 0;
+}
+
+.welcome {
+  font-size: 18px;
+  margin-right: 10px;
+  font-weight: 500;
+}
+
 .logout-btn {
   background: #ff4b4b;
   color: white;
@@ -110,18 +160,78 @@
   transform: scale(1.05);
 }
 
-.header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #4cafef;
-  padding: 15px 30px;
-  border-radius: 0 0 12px 12px;
-  color: white;
+/* 🌐 --- RESPONSIVE DESIGN --- */
+
+/* 📘 Tablets (pantallas medianas) */
+@media (max-width: 1024px) {
+  .notas-main {
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
+    padding: 15px;
+  }
+
+  .calendar-section,
+  .notas-container {
+    width: 90%;
+  }
+
+  .header {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .header h1 {
+    font-size: 1.6rem;
+  }
 }
 
-.welcome {
-  font-size: 18px;
-  margin-right: 10px;
-  font-weight: 500;
+/* 📱 Celulares (pantallas pequeñas) */
+@media (max-width: 600px) {
+  .notas-main {
+    padding: 10px;
+    gap: 15px;
+  }
+
+  .calendar-section,
+  .notas-container {
+    width: 100%;
+    padding: 15px;
+  }
+
+  .header {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 10px 15px;
+  }
+
+  .welcome {
+    font-size: 16px;
+    margin: 5px 0;
+  }
+
+  .logout-btn {
+    width: 100%;
+    margin: 10px 0 0;
+  }
+
+  .notas-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .notas-actions {
+    align-self: flex-end;
+  }
+
+  .notas-input,
+  .notas-input-date {
+    font-size: 0.9rem;
+  }
+
+  .notas-add-btn {
+    font-size: 0.95rem;
+  }
 }
