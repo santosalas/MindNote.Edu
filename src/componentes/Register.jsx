@@ -7,9 +7,10 @@ function Register() {
   const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [rol, setRol] = useState("usuario");
+  const [rol, setRol] = useState("Usuario"); // Cambiado a "Usuario" (con mayúscula)
   const [claveAdmin, setClaveAdmin] = useState("");
   const [aceptaTerminos, setAceptaTerminos] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const navigate = useNavigate();
 
@@ -21,7 +22,7 @@ function Register() {
         title: "Ya tienes sesión activa",
         text: "Si quieres registrarte otra vez cierra sesión primero.",
       }).then(() => {
-        if (user.rol === "administrador") {
+        if (user.rol === "Administrador") {
           navigate("/admin");
         } else {
           navigate("/notas");
@@ -30,49 +31,62 @@ function Register() {
     }
   }, [navigate]);
 
-  const handleRegister = (e) => {
+  const handleRegister = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (!nombre.trim() || !email.trim() || !password.trim()) {
       Swal.fire("Error", "Todos los campos son obligatorios.", "error");
+      setLoading(false);
       return;
     }
 
     if (!aceptaTerminos) {
       Swal.fire("Error", "Debes aceptar los términos y condiciones.", "error");
+      setLoading(false);
       return;
     }
 
-    if (rol === "administrador" && claveAdmin !== "MindNote.edu") {
+    if (rol === "Administrador" && claveAdmin !== "MindNote.edu") {
       Swal.fire("Error", "La clave especial de administrador es incorrecta.", "error");
+      setLoading(false);
       return;
     }
 
-    const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers")) || [];
+    try {
+      // 📝 REGISTRO EN EL BACKEND
+      const userData = {
+        nombre: nombre.trim(),
+        email: email.trim(),
+        password: password.trim(),
+        rol: rol // "Usuario" o "Administrador" (con mayúscula)
+      };
 
-    if (registeredUsers.some((u) => u.email === email)) {
-      Swal.fire("Error", "Este correo ya está registrado.", "error");
-      return;
-    }
+      const response = await fetch('http://localhost:9000/api/users', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(userData)
+      });
 
-    const newUser = {
-      nombre: nombre.trim(),
-      email: email.trim(),
-      password: password.trim(),
-      rol,
-    };
+      const data = await response.json();
 
-    registeredUsers.push(newUser);
-    localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers));
-    localStorage.setItem("user", JSON.stringify(newUser));
-
-    Swal.fire("Registro exitoso", `Bienvenido ${nombre}`, "success").then(() => {
-      if (rol === "administrador") {
-        navigate("/admin");
+      if (data.success) {
+        Swal.fire("Registro exitoso", `Bienvenido ${nombre}`, "success").then(() => {
+          // Redirigir al login para que inicie sesión
+          navigate("/login");
+        });
       } else {
-        navigate("/notas");
+        Swal.fire("Error", data.message || "Error al registrar el usuario", "error");
       }
-    });
+
+    } catch (error) {
+      console.error("Error en registro:", error);
+      Swal.fire("Error", "No se pudo conectar con el servidor. Verifica que el backend esté corriendo.", "error");
+    } finally {
+      setLoading(false);
+    }
   };
 
   const openTerminos = (e) => {
@@ -108,6 +122,7 @@ function Register() {
             value={nombre}
             onChange={(e) => setNombre(e.target.value)}
             required
+            disabled={loading}
           />
         </label>
 
@@ -120,6 +135,7 @@ function Register() {
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
+            disabled={loading}
           />
         </label>
 
@@ -132,6 +148,7 @@ function Register() {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
+            disabled={loading}
           />
         </label>
 
@@ -141,9 +158,10 @@ function Register() {
             <input
               type="radio"
               name="rol"
-              value="usuario"
-              checked={rol === "usuario"}
+              value="Usuario"
+              checked={rol === "Usuario"}
               onChange={(e) => setRol(e.target.value)}
+              disabled={loading}
             />
             Usuario
           </label>
@@ -151,15 +169,16 @@ function Register() {
             <input
               type="radio"
               name="rol"
-              value="administrador"
-              checked={rol === "administrador"}
+              value="Administrador"
+              checked={rol === "Administrador"}
               onChange={(e) => setRol(e.target.value)}
+              disabled={loading}
             />
             Administrador
           </label>
         </div>
 
-        {rol === "administrador" && (
+        {rol === "Administrador" && (
           <label className="field-label">
             Clave especial (administrador)
             <input
@@ -168,7 +187,8 @@ function Register() {
               placeholder="Clave especial"
               value={claveAdmin}
               onChange={(e) => setClaveAdmin(e.target.value)}
-              required={rol === "administrador"}
+              required={rol === "Administrador"}
+              disabled={loading}
             />
             <small className="hint">
               Introduce la clave especial para registrar administradores.
@@ -181,6 +201,7 @@ function Register() {
             type="checkbox"
             checked={aceptaTerminos}
             onChange={(e) => setAceptaTerminos(e.target.checked)}
+            disabled={loading}
           />
           <span>
             Acepto los{" "}
@@ -190,8 +211,8 @@ function Register() {
           </span>
         </label>
 
-        <button className="btn-register" type="submit">
-          Registrar
+        <button className="btn-register" type="submit" disabled={loading}>
+          {loading ? "Registrando..." : "Registrar"}
         </button>
 
         <div className="login-link">

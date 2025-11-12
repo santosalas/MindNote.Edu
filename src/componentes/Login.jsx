@@ -8,6 +8,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [locked, setLocked] = useState(false);
   const [timeLeft, setTimeLeft] = useState(0);
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   // ⏳ Revisar bloqueo en localStorage al cargar
@@ -47,7 +48,7 @@ const Login = () => {
         title: "Ya tienes sesión activa",
         text: `Ya has iniciado sesión como ${user.rol}.`
       }).then(() => {
-        if (user.rol === "administrador") {
+        if (user.rol === "Administrador") {
           navigate("/admin");
         } else {
           navigate("/notas");
@@ -56,8 +57,9 @@ const Login = () => {
     }
   }, [navigate]);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     if (locked) {
       Swal.fire({
@@ -67,64 +69,88 @@ const Login = () => {
           timeLeft / 60
         )} minutos.`,
       });
+      setLoading(false);
       return;
     }
 
-    const registeredUsers =
-      JSON.parse(localStorage.getItem("registeredUsers")) || [];
-
-    const user = registeredUsers.find(
-      (u) => u.email === email && u.password === password
-    );
-
-    if (user) {
-      // 🔑 Éxito → limpiar intentos fallidos y bloqueo
-      localStorage.removeItem("loginAttempts");
-      localStorage.removeItem("loginLock");
-
-      localStorage.setItem("user", JSON.stringify(user));
-
-      Swal.fire({
-        icon: "success",
-        title: `Bienvenido, ${user.nombre}`,
-        text: `Has iniciado como ${user.rol}.`,
-        showConfirmButton: false,
-        timer: 2000,
-      }).then(() => {
-        if (user.rol === "administrador") {
-          navigate("/admin");
-        } else {
-          navigate("/notas");
-        }
+    try {
+      // 🔐 CONEXIÓN CON EL BACKEND - LOGIN
+      const response = await fetch('http://localhost:9000/api/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password })
       });
-    } else {
-      // ❌ Credenciales incorrectas
-      let attempts = parseInt(localStorage.getItem("loginAttempts") || "0");
-      attempts += 1;
-      localStorage.setItem("loginAttempts", attempts);
 
-      if (attempts >= 3) {
-        // 🔒 Bloqueo por 5 minutos
-        const lockInfo = {
-          expiry: Date.now() + 5 * 60 * 1000, // 5 minutos
-        };
-        localStorage.setItem("loginLock", JSON.stringify(lockInfo));
+      const data = await response.json();
+
+      if (data.success) {
+        // ✅ LOGIN EXITOSO
+        // Limpiar intentos fallidos y bloqueo
         localStorage.removeItem("loginAttempts");
-        setLocked(true);
-        setTimeLeft(5 * 60);
+        localStorage.removeItem("loginLock");
+
+        // Guardar usuario y token en localStorage
+        localStorage.setItem("user", JSON.stringify(data.user));
+        if (data.token) {
+          localStorage.setItem("token", data.token);
+        }
 
         Swal.fire({
-          icon: "error",
-          title: "Demasiados intentos",
-          text: "Has sido bloqueado por 5 minutos.",
+          icon: "success",
+          title: `Bienvenido, ${data.user.nombre}`,
+          text: `Has iniciado como ${data.user.rol}.`,
+          showConfirmButton: false,
+          timer: 2000,
+        }).then(() => {
+          if (data.user.rol === "Administrador") {
+            navigate("/admin");
+          } else {
+            navigate("/notas");
+          }
         });
+
       } else {
-        Swal.fire({
-          icon: "error",
-          title: "Credenciales incorrectas",
-          text: `Verifica tu correo y contraseña. Intento ${attempts} de 3.`,
-        });
+        // ❌ CREDENCIALES INCORRECTAS
+        let attempts = parseInt(localStorage.getItem("loginAttempts") || "0");
+        attempts += 1;
+        localStorage.setItem("loginAttempts", attempts);
+
+        if (attempts >= 3) {
+          // 🔒 Bloqueo por 5 minutos
+          const lockInfo = {
+            expiry: Date.now() + 5 * 60 * 1000, // 5 minutos
+          };
+          localStorage.setItem("loginLock", JSON.stringify(lockInfo));
+          localStorage.removeItem("loginAttempts");
+          setLocked(true);
+          setTimeLeft(5 * 60);
+
+          Swal.fire({
+            icon: "error",
+            title: "Demasiados intentos",
+            text: "Has sido bloqueado por 5 minutos.",
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: "Credenciales incorrectas",
+            text: `Verifica tu correo y contraseña. Intento ${attempts} de 3.`,
+          });
+        }
       }
+
+    } catch (error) {
+      // 🔌 ERROR DE CONEXIÓN
+      console.error("Error en login:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error de conexión",
+        text: "No se pudo conectar con el servidor. Verifica que el backend esté corriendo en puerto 9000.",
+      });
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -144,7 +170,7 @@ const Login = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          disabled={locked}
+          disabled={locked || loading}
         />
         <input
           type="password"
@@ -152,10 +178,10 @@ const Login = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          disabled={locked}
+          disabled={locked || loading}
         />
-        <button type="submit" disabled={locked}>
-          Entrar
+        <button type="submit" disabled={locked || loading}>
+          {loading ? "Iniciando sesión..." : "Entrar"}
         </button>
       </form>
       <p>
