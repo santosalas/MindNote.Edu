@@ -16,6 +16,7 @@ function Admin() {
       return;
     }
 
+    
     const registrados = JSON.parse(localStorage.getItem("registeredUsers")) || [];
     setUsuarios(registrados);
   }, [navigate]);
