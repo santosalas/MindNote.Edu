@@ -163,25 +163,6 @@ function Notas() {
     [user]
   );
 
-  // 🚪 Cerrar sesión
-  const handleLogout = () => {
-    Swal.fire({
-      title: "¿Seguro que deseas cerrar sesión?",
-      icon: "question",
-      showCancelButton: true,
-      confirmButtonText: "Sí, salir",
-      cancelButtonText: "Cancelar",
-      confirmButtonColor: "#3085d6",
-      cancelButtonColor: "#d33"
-    }).then((result) => {
-      if (result.isConfirmed) {
-        clearAllNotifications(); // 🔴 Cancelar notificaciones pendientes
-        localStorage.removeItem("user");
-        navigate("/");
-      }
-    });
-  };
-
   // ➕ Agregar o editar nota
   const addTask = () => {
     if (input.trim() === "" || date === "") {
@@ -294,18 +275,8 @@ function Notas() {
 
   return (
     <div className="notas-page">
-      <header className="header">
-        <h1>Mindnote</h1>
-        <div>
-          <span className="welcome">
-            👋 Bienvenido, <b>{user?.nombre || "Invitado"}</b> ({user?.rol || "usuario"})
-          </span>
-          <button onClick={handleLogout} className="logout-btn">
-            Cerrar Sesión
-          </button>
-        </div>
-      </header>
-
+      {/* EL HEADER HA SIDO ELIMINADO - AHORA ESTÁ EN EL NAVBAR */}
+      
       <div className="notas-main">
         {/* 📅 Calendario */}
         <div className="calendar-section">
@@ -326,7 +297,7 @@ function Notas() {
               className="notas-input-date"
             />
             <button onClick={addTask} className="notas-add-btn">
-              {editIndex !== null ? "✏️ Guardar" : "➕"}
+              {editIndex !== null ? "✏️ Guardar" : "➕ Agregar Nota"}
             </button>
           </div>
         </div>
@@ -372,7 +343,8 @@ function Notas() {
           </ul>
         </div>
       </div>
-    </div>
+
+      </div>
   );
 }
 
