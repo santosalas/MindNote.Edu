@@ -135,3 +135,60 @@ Brando Morales
 🌐 GitHub: BrandoMorales
 
 📧 Correo: (añade aquí tu email si deseas compartirlo)......
+
+
+|
+|
+|
+|
+|
+|
+|
+|
+|
+|
+21/11/2025 Personal Software Process (PSP) al proyecto
+
+# Mindnote.edu - Sistema de Recordatorios Inteligentes
+
+## 🎯 Descripción del Proyecto
+Sistema diseñado para ayudar a los usuarios a organizar su día a día, registrando citas y compromisos con notificaciones automáticas recordatorias.
+
+### Características Principales
+- ✅ Registro rápido de citas y compromisos
+- 🔔 Notificaciones automáticas 1 hora antes de cada evento
+- 📱 Interfaz intuitiva y fácil de usar
+- 💾 Almacenamiento seguro de datos
+
+## 🏗️ Aplicación del Personal Software Process (PSP)
+
+### Objetivos de Calidad PSP
+| Objetivo | Meta | Estado |
+|----------|------|--------|
+| Densidad de defectos | < 5 defectos/KLOC | | En progreso |
+| Precisión en estimaciones | ±15% error máximo | | En progreso |
+| Tiempo en revisión | 25-30% del total | | En progreso |
+| Productividad | 25-30 LOC/hora | | En progreso |
+
+## 📊 Métricas y Seguimiento PSP
+
+### Registro de Tiempos
+Usamos **Clockify** para tracking detallado por fases:
+
+| Fase | Tiempo Estimado | Tiempo Real | Desviación |
+|------|-----------------|-------------|------------|
+| Planificación | 10 horas | | |
+| Diseño | 15 horas | | |
+| Codificación | 30 horas | | |
+| Revisión | 15 horas | | |
+| Pruebas | 10 horas | | |
+| **Total** | **80 horas** | | |
+
+### Seguimiento de Defectos
+Usamos **GitHub Issues** para gestión de defectos:
+
+```bash
+# Etiquetas configuradas para PSP
+🐛-bug-crítico    🐛-bug-normal    🐛-bug-menor
+✨-feature        📝-documentación  🔧-refactor
+⚡-mejora-rendimiento
